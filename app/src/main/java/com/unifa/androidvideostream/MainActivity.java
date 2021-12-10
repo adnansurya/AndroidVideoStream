@@ -1,5 +1,6 @@
 package com.unifa.androidvideostream;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.ProgressDialog;
@@ -11,6 +12,8 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
@@ -19,6 +22,17 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.MediaController;
 import android.widget.VideoView;
+
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
+
+import java.io.ByteArrayOutputStream;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -71,14 +85,50 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Bitmap bitmap = viewToImage(MainActivity.this, webView);
                 imView.setImageBitmap(bitmap);
+                DateFormat df = new SimpleDateFormat("d-MM-yyyy_HH:mm:ss");
+                String date = df.format(Calendar.getInstance().getTime());
+
+                StorageReference storageRef = FirebaseStorage.getInstance().getReference();
+
+// Create a reference to "mountains.jpg"
+                StorageReference imagesRef = storageRef.child("images/" + date + ".jpg");
+
+
+//                Bitmap bitmap = ((BitmapDrawable) imageView.getDrawable()).getBitmap();
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+                byte[] data = baos.toByteArray();
+
+                UploadTask uploadTask = imagesRef.putBytes(data);
+                uploadTask.addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception exception) {
+                        // Handle unsuccessful uploads
+                    }
+                }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                        // taskSnapshot.getMetadata() contains file metadata such as size, content-type, etc.
+                        // ...
+                    }
+                });
 
             }
         });
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
+
+        MenuInflater menuInflater = getMenuInflater();
+        menuInflater.inflate(R.menu.action,menu);
+        return true;
+    }
+
     public static Bitmap viewToImage(Context context,
                                      WebView viewToBeConverted) {
-        int extraSpace = 2000; //because getContentHeight doesn't always return the full screen height.
+        int extraSpace = 200; //because getContentHeight doesn't always return the full screen height.
         int height = viewToBeConverted.getContentHeight() + extraSpace;
 
         Bitmap viewBitmap = Bitmap.createBitmap(

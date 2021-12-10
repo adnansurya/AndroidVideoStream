@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "262526692224",
+    "firebase_url": "https://vidstream-332d0-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "vidstream-332d0",
+    "storage_bucket": "vidstream-332d0.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:262526692224:android:6190ea3acd3dda56242f65",
+        "android_client_info": {
+          "package_name": "com.unifa.androidvideostream"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "262526692224-2nhfqbf2sc5r0cihug2j37nddngi8p28.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA9XR5-8vxAtS8fGq8WW-4VeZQTs6N2w7w"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "262526692224-2nhfqbf2sc5r0cihug2j37nddngi8p28.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
