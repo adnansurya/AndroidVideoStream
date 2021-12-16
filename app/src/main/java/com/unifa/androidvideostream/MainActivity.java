@@ -3,6 +3,7 @@ package com.unifa.androidvideostream;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -14,6 +15,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
@@ -21,10 +23,15 @@ import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.MediaController;
+import android.widget.Toast;
 import android.widget.VideoView;
 
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -33,21 +40,29 @@ import java.io.ByteArrayOutputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
 
     ProgressDialog pDialog;
     VideoView videoview;
 //    String vid_url ="https://www.youtube.com/watch?v=QnOcXQL2wDA&t=18s";
-    String vid_url ="192.168.1.5";
+    String vid_url ="192.168.1.13";
 
     ImageView imView;
     Button tesBtn;
+
+    FirebaseDatabase database;
+    DatabaseReference myRef;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        database = FirebaseDatabase.getInstance();
+        myRef = database.getReference("gambar");
+
 
         imView = findViewById(R.id.imageView);
         tesBtn = findViewById(R.id.button);
@@ -106,10 +121,53 @@ public class MainActivity extends AppCompatActivity {
                         // Handle unsuccessful uploads
                     }
                 }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+
+
                     @Override
                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+
+                        imagesRef.getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Uri> task) {
+                                String profileImageUrl= Objects.requireNonNull(task.getResult()).toString();
+
+                                Upload upload = new Upload(date,
+                                        profileImageUrl);
+
+                                String uploadId = myRef.push().getKey();
+                                assert uploadId != null;
+
+                                myRef.child(uploadId).setValue(upload);
+                                Log.i("URL",profileImageUrl);
+                            }
+                        });
+                    }
+
+
                         // taskSnapshot.getMetadata() contains file metadata such as size, content-type, etc.
                         // ...
+//                        Task<Uri> uri = taskSnapshot.getStorage().getDownloadUrl();
+//                        String linkUrl = null;
+//                        while(!uri.isComplete()){
+//                            Uri url = uri.getResult();
+//                            assert url != null;
+//                            linkUrl = url.toString();
+//                        }
+//
+//                        if(linkUrl != null){
+//                            Upload upload = new Upload(date, linkUrl);
+//                            String uploadId = myRef.push().getKey();
+//                            assert uploadId != null;
+//                            myRef.child(uploadId).setValue(upload);
+//                        }
+
+
+
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+//                                progressBar.setVisibility(View.GONE);
+                        Toast.makeText(MainActivity.this, "aaa "+e.getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 });
 
@@ -151,5 +209,26 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return viewBitmap;
+    }
+
+    @SuppressLint("NonConstantResourceId")
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+
+            case R.id.action_gambar:
+                // User chose the "Favorite" action, mark the current item
+                // as a favorite...
+                Intent scan  = new Intent(this, GambarActivity.class);
+                startActivity(scan);
+                return true;
+
+
+            default:
+                // If we got here, the user's action was not recognized.
+                // Invoke the superclass to handle it.
+                return super.onOptionsItemSelected(item);
+
+        }
     }
 }

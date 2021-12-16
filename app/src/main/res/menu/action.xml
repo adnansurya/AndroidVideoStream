@@ -5,7 +5,7 @@
     <!-- "Mark Favorite", should appear as action button if possible -->
 
     <item
-        android:id="@+id/action_histori"
+        android:id="@+id/action_gambar"
         android:icon="@drawable/ic_image"
         android:title="Gambar"
         app:showAsAction="ifRoom"
