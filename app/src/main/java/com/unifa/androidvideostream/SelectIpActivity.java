@@ -19,6 +19,7 @@ public class SelectIpActivity extends AppCompatActivity {
         setContentView(R.layout.activity_select_ip);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setCancelable(false);
         builder.setTitle("Masukkan IP");
 
         // Set up the input

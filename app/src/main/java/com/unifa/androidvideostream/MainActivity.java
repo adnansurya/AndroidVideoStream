@@ -22,6 +22,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
 
@@ -55,10 +56,12 @@ public class MainActivity extends AppCompatActivity {
     Button tesBtn;
 
     FirebaseDatabase database;
-    DatabaseReference gambarRef, pirRef;
+    DatabaseReference gambarRef, pirRef, infraredRef, ldrRef;
 
     int adaGerak = 0;
     WebView webView;
+
+    TextView gerakTxt, jaringTxt, cahayaTxt;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,9 +71,14 @@ public class MainActivity extends AppCompatActivity {
         database = FirebaseDatabase.getInstance();
         gambarRef = database.getReference("gambar");
         pirRef = database.getReference("pir");
+        infraredRef = database.getReference("infrared");
+        ldrRef = database.getReference("ldr");
 
         vid_url = getIntent().getStringExtra("ip");
 
+        jaringTxt = findViewById(R.id.jaringTxt);
+        cahayaTxt = findViewById(R.id.cahayaTxt);
+        gerakTxt = findViewById(R.id.gerakTxt);
 
         imView = findViewById(R.id.imageView);
         tesBtn = findViewById(R.id.button);
@@ -118,13 +126,58 @@ public class MainActivity extends AppCompatActivity {
                     adaGerak = snapshot.getValue(Integer.class);
                 }
                 if(adaGerak == 1){
+                    gerakTxt.setText("Ada");
                     takeImage();
 //                    new Handler().postDelayed(() -> {
 //                        // TODO Auto-generated method stub
 //                        Toast.makeText(MainActivity.this, "Ambil Gambar", Toast.LENGTH_SHORT).show();
 //                    }, 2000);
+                }else{
+                    gerakTxt.setText("Tidak Ada");
                 }
 
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+        infraredRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                int jaringNaik = 0;
+                if(snapshot.getValue() != null){
+                    jaringNaik = snapshot.getValue(Integer.class);
+                }
+                if(jaringNaik == 1) {
+                    jaringTxt.setText("Naik");
+                }else{
+                    jaringTxt.setText("Turun");
+                }
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+        ldrRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                int cahayaTerang = 0;
+                if(snapshot.getValue() != null){
+                    cahayaTerang = snapshot.getValue(Integer.class);
+                }
+                if(cahayaTerang == 1) {
+                    cahayaTxt.setText("Terang");
+                }else{
+                    cahayaTxt.setText("Gelap");
+                }
             }
 
             @Override
