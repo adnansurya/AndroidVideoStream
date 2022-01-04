@@ -49,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
     ProgressDialog pDialog;
     VideoView videoview;
 //    String vid_url ="https://www.youtube.com/watch?v=QnOcXQL2wDA&t=18s";
-    String vid_url ="192.168.43.242";
+    String vid_url ="192.168.86.249";
 
     ImageView imView;
     Button tesBtn;
@@ -68,6 +68,8 @@ public class MainActivity extends AppCompatActivity {
         database = FirebaseDatabase.getInstance();
         gambarRef = database.getReference("gambar");
         pirRef = database.getReference("pir");
+
+        vid_url = getIntent().getStringExtra("ip");
 
 
         imView = findViewById(R.id.imageView);
